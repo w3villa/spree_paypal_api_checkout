@@ -2,7 +2,7 @@ module Spree
   class Gateway::PayPalCheckout < Gateway
     preference :api_key, :string
     preference :secret_key, :string
-    preference :server, :string, default: 'https://api-m.sandbox.paypal.com'
+    preference :server, :string, default: 'api-m.sandbox.paypal.com'
 
     def supports?(source)
       true
