@@ -1,12 +1,12 @@
 Gem::Specification.new do |s|
   s.name = "spree_paypal_api_checkout".freeze
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Spree Commerce".freeze]
   s.date = "2022-02-22"
-  s.description = "Adds PayPal Express as a Payment Method to Spree Commerce".freeze
+  s.description = "Adds PayPal API Checkout as a Payment Method to Spree Commerce".freeze
   s.email = "gems@spreecommerce.com".freeze
   s.files = [".gitignore".freeze, "Gemfile".freeze, "README.md".freeze, "Rakefile".freeze, "app/assets/javascripts/spree/backend/spree_paypal_checkout.js".freeze, "app/assets/javascripts/spree/frontend/spree_paypal_checkout.js".freeze, "app/assets/stylesheets/spree/backend/spree_paypal_checkout.css".freeze, "app/assets/stylesheets/spree/frontend/spree_paypal_checkout.css".freeze, "app/controllers/spree/admin/payments_controller_decorator.rb".freeze, "app/controllers/spree/admin/paypal_checkout_payments_controller.rb".freeze, "app/controllers/spree/paypal_checkout_controller.rb".freeze, "app/models/spree/gateway/pay_pal_checkout.rb".freeze, "app/models/spree/paypal_api_checkout.rb".freeze, "app/views/spree/admin/payments/_paypal_complete.html.erb".freeze, "app/views/spree/admin/payments/paypal_refund.html.erb".freeze, "app/views/spree/admin/payments/source_forms/_paypal.html.erb".freeze, "app/views/spree/admin/payments/source_views/_paypal.html.erb".freeze, "app/views/spree/checkout/payment/_paypal_checkout.html.erb".freeze, "config/locales/de.yml".freeze, "config/locales/en.yml".freeze, "config/locales/es.yml".freeze, "config/locales/it.yml".freeze, "config/locales/pl.yml".freeze, "config/locales/pt.yml".freeze, "config/routes.rb".freeze, "db/migrate/20220620042734_create_spree_paypal_api_checkouts.rb".freeze, "lib/generators/spree_paypal_api_checkout/install/install_generator.rb".freeze, "lib/spree_paypal_api_checkout.rb".freeze, "lib/spree_paypal_api_checkout/engine.rb".freeze, "lib/spree_paypal_api_checkout/version.rb".freeze, "script/rails".freeze, "spree_paypal_api_checkout.gemspec".freeze]
   s.homepage = "http://www.spreecommerce.com".freeze
