@@ -49,14 +49,14 @@ module Spree
       order = current_order || raise(ActiveRecord::RecordNotFound)
       order.payments.last.source.update(transaction_id: params[:transaction_id])
       order.next
+      path = checkout_state_path(order.state)
       if order.complete?
         flash.notice = Spree.t(:order_processed_successfully)
         flash[:order_completed] = true
         session[:order_id] = nil
-        redirect_to completion_route(order)
-      else
-        redirect_to checkout_state_path(order.state)
+        path = completion_route(order)
       end
+      render json: { redirect_to: path }
     end
 
     def cancel
