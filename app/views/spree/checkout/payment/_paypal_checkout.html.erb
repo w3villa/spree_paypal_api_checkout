@@ -1,6 +1,7 @@
 <div id="paypal-button-container" class="paypal-button-container"></div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://www.paypal.com/sdk/js?client-id=<%= CONSTANTS[:BUSINESS_CLIENT_ID] %>&currency=<%= @order.currency %>"></script>
+<script type="text/javascript" src="https://www.paypal.com/sdk/js?client-id=<%= payment_method.api_key %>&currency=<%= @order.currency %>"></script>
+
 <script type="text/javascript">
   paypal.Buttons({
     style: {
