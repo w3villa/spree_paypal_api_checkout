@@ -27,7 +27,10 @@
           var transaction = orderData.purchase_units[0].payments.captures[0];
           fetch(`/paypal_checkout/proceed?number=${data.orderID}&status=${transaction.status}&transaction_id=${transaction.id}`, {
             method: "get",
-          })
+          }).then((response) => response.json())
+            .then((orderData2) => {
+              window.location.href = `${window.location.origin}${orderData2.redirect_to}`
+            });
         });
     }
   }).render('#paypal-button-container');

@@ -4,7 +4,7 @@
 
 1. Add this extension to your Gemfile with this line:
         
-        gem 'spree_paypal_api_checkout', '~> 0.0.6'
+        gem 'spree_paypal_api_checkout', '~> 0.0.7'
 
 2. Install the gem using Bundler:
 

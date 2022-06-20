@@ -1,5 +1,5 @@
 module Spree::Admin::PaymentsControllerDecorator
-  def paypal_refund
+  def paypal_checkout_refund
     if request.get?
       if @payment.source.state == 'refunded'
         flash[:error] = Spree.t(:already_refunded, :scope => 'paypal')
@@ -7,7 +7,7 @@ module Spree::Admin::PaymentsControllerDecorator
       end
     elsif request.post?
       response = @payment.payment_method.refund(@payment, params[:refund_amount])
-      if response.success?
+      if response['status']=='COMPLETED'
         flash[:success] = Spree.t(:refund_successful, :scope => 'paypal')
         redirect_to admin_order_payments_path(@order)
       else
