@@ -19,7 +19,7 @@ module SpreePaypalCheckout
       end
 
       def add_migrations
-        run 'bundle exec rake railties:install:migrations FROM=spree_paypal_checkout'
+        run 'bundle exec rake railties:install:migrations FROM=spree_paypal_api_checkout'
       end
 
       def run_migrations
