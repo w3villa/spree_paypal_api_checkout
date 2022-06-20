@@ -1,3 +1,3 @@
-module SpreePayPalCheckout
+module SpreePaypalApiCheckout
   VERSION = '0.0.1'
 end

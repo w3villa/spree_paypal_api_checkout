@@ -1,4 +1,4 @@
-module SpreePaypalCheckout
+module SpreePaypalApiCheckout
   class Engine < Rails::Engine
     require 'spree/core'
     isolate_namespace Spree
