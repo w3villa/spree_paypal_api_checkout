@@ -19,7 +19,7 @@ module Spree
         items << {
           name: adjustment.label,
           quantity: 1,
-          amount: {
+          unit_amount: {
             currency_code: order.currency,
             value: adjustment.amount
           }
@@ -70,13 +70,14 @@ module Spree
     def line_item(item)
       {
           name: item.product.name,
-          number: item.variant.sku,
+          sku: item.variant.sku,
           quantity: item.quantity,
-          amount: {
+          description: item.product.meta_description,
+          unit_amount: {
             currency_code: item.order.currency,
             value: item.price
           },
-          ItemCategory: "Physical"
+          item_category: "Physical"
       }
     end
 
@@ -87,11 +88,35 @@ module Spree
           {
             amount: {
               currency_code: current_order.currency,
-              value: order.total
+              value: order.total,
+              breakdown: {
+                item_total: {
+                  currency_code: current_order.currency,
+                  value: items.sum{|r| (r[:unit_amount][:value] * r[:quantity]) }
+                }
+              }
             },
-            item: items
+            items: items,
+            shipping: address_options
           },
         ]
+      }
+    end
+
+    def address_options
+      address = current_order.ship_address
+      {
+        name: { full_name: address.try(:full_name) },
+        address: {
+          address_line_1: address.address1,
+          address_line_2: address.address2,
+          # phone: address.phone,
+          admin_area_1: address.state_text,
+          admin_area_2: address.city,
+          country_code: address.country.iso,
+          postal_code: address.zipcode
+        },
+        type: 'SHIPPING'
       }
     end
 
