@@ -93,6 +93,10 @@ module Spree
                 item_total: {
                   currency_code: current_order.currency,
                   value: items.sum{|r| (r[:unit_amount][:value] * r[:quantity]) }
+                },
+                shipping: {
+                  currency_code: current_order.currency,
+                  value: current_order.shipments.sum(:cost)
                 }
               }
             },
