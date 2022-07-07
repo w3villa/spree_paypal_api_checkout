@@ -8,13 +8,14 @@ module Spree
       additional_adjustments = order.all_adjustments.additional
       tax_adjustments = additional_adjustments.tax
       shipping_adjustments = additional_adjustments.shipping
+      promotion_adjustments = additional_adjustments.promotion
 
       additional_adjustments.eligible.each do |adjustment|
         # Because PayPal doesn't accept $0 items at all. See #10
         # https://cms.paypal.com/uk/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECCustomizing
         # "It can be a positive or negative value but not zero."
         next if adjustment.amount.zero?
-        next if tax_adjustments.include?(adjustment) || shipping_adjustments.include?(adjustment)
+        next if tax_adjustments.include?(adjustment) || shipping_adjustments.include?(adjustment) || promotion_adjustments.include?(adjustment)
 
         items << {
           name: adjustment.label,
@@ -26,7 +27,7 @@ module Spree
         }
       end
 
-      pp_response = provider.create_order(order, express_checkout_request_details(order, items))
+      pp_response = provider.create_order(order, express_checkout_request_details(order: order, items: items, tax_adjustments: tax_adjustments, promotion_adjustments: promotion_adjustments))
 
       render json: pp_response
     end
@@ -48,6 +49,7 @@ module Spree
     def proceed
       order = current_order || raise(ActiveRecord::RecordNotFound)
       order.payments.last.source.update(transaction_id: params[:transaction_id])
+      order.payments.last.update(response_code: params[:transaction_id])
       order.next
       path = checkout_state_path(order.state)
       if order.complete?
@@ -81,7 +83,7 @@ module Spree
       }
     end
 
-    def express_checkout_request_details order, items
+    def express_checkout_request_details order:, items:, tax_adjustments:, promotion_adjustments:
       {
         intent: 'CAPTURE',
         purchase_units: [
@@ -97,6 +99,14 @@ module Spree
                 shipping: {
                   currency_code: current_order.currency,
                   value: current_order.shipments.sum(:cost)
+                },
+                tax_total: {
+                  currency_code: current_order.currency,
+                  value: tax_adjustments.sum(:amount)
+                },
+                discount: {
+                  currency_code: current_order.currency,
+                  value: promotion_adjustments.sum(:amount).abs
                 }
               }
             },
