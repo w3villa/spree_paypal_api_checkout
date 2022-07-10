@@ -15,6 +15,7 @@ it:
       refund_unsuccessful: "Rimborso PayPal non completato"
       actions:
         refund: "Rimborso"
+      status: Stato
       flash:
         cancel: "Non vuoi usare PayPal? Nessun problema."
         connection_failed: "Impossibile connettersi a PayPal."

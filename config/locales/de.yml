@@ -15,6 +15,7 @@ de:
       refund_unsuccessful: "PayPal Erstattung nicht erfolgreich"
       actions:
         refund: "Erstatten"
+      status: 'Toestand'
       flash:
         cancel: "Sie wollen PayPal doch nicht benutzen? Kein Problem."
         connection_failed: "Verbindung zu Paypal nicht erfolgreich."
