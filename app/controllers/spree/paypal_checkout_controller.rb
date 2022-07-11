@@ -1,6 +1,7 @@
 module Spree
   class PaypalCheckoutController < StoreController
     skip_before_action :verify_authenticity_token
+
     def express
       order = current_order || raise(ActiveRecord::RecordNotFound)
       items = order.line_items.map(&method(:line_item))
@@ -27,22 +28,17 @@ module Spree
         }
       end
 
-      pp_response = provider.create_order(order, express_checkout_request_details(order: order, items: items, tax_adjustments: tax_adjustments, promotion_adjustments: promotion_adjustments))
+      details = express_checkout_request_details(order: order, items: items, tax_adjustments: tax_adjustments, promotion_adjustments: promotion_adjustments)
+      pp_response = provider.parse_response(provider.create_order(order, details))
 
       render json: pp_response
     end
 
     def confirm
       order = current_order || raise(ActiveRecord::RecordNotFound)
-      response = provider.capture_payment(params[:number])
-      order.payments.create!({
-        source: Spree::PaypalApiCheckout.create({
-          token: response['id'],
-          payer_id: response['payer']['payer_id']
-        }),
-        amount: order.total,
-        payment_method: payment_method
-      })
+
+      response = provider.set_payment_records(order, params[:number], payment_method)
+
       render json: response
     end
 

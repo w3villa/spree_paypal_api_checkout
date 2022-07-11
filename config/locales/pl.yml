@@ -15,6 +15,7 @@ pl:
       refund_unsuccessful: "Błąd podczas wykonywania zwrotu PayPal"
       actions:
         refund: "Zwróć Płatność"
+      status: Status
       flash:
         cancel: "Nie chcesz użyć PayPal? Nie ma problemu."
         connection_failed: "Nie można było połączyć się z usługą PayPal."

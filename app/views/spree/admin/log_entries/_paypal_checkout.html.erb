@@ -1,0 +1,8 @@
+<% currency = ::Money::Currency.new(entry.source.currency) %>
+<tr>
+  <td><b><%= Spree.t('paypal.status').capitalize %></b></td>
+  <td><%= entry.source.amount.negative? ? entry.source.source.source.state : entry.source.state %></td>
+  <td><%= entry.parsed_paypal_entry %></td>
+  <td><%= currency.symbol %><%= entry.source.amount %></td>
+  <td><%= entry.source.response_code %></td>
+</tr>

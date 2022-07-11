@@ -15,6 +15,7 @@ en:
       refund_unsuccessful: "PayPal refund unsuccessful"
       actions:
         refund: "Refund"
+      status: Status
       flash:
         cancel: "Don't want to use PayPal? No problems."
         connection_failed: "Could not connect to PayPal."

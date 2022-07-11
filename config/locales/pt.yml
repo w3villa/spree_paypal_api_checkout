@@ -15,6 +15,7 @@ pt:
       refund_unsuccessful: "Não foi possível reembolsar o pagamento de PayPal"
       actions:
         refund: "Reembolso"
+      status: Status
       flash:
         cancel: "Não pretende usar PayPal? Não há problema."
         connection_failed: "Não foi possível estabelecer ligação com o PayPal."
