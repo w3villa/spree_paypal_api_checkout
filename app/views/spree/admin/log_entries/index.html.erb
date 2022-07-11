@@ -1,0 +1,27 @@
+<%= render :partial => 'spree/admin/shared/order_tabs', locals: { current: 'Payments' }%>
+
+<% content_for :page_title do %>
+  <i class="icon-arrow-right"></i>
+  <%= I18n.t(:one, scope: "activerecord.models.spree/payment") %>
+  <i class="icon-arrow-right"></i>
+  <%= Spree.t(:log_entries) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= button_link_to Spree.t(:logs), spree.admin_order_payment_log_entries_url(@order, @payment), icon: 'file.svg' %>
+<% end %>
+
+<table class='table table-striped' id='listing_log_entries'>
+  <% @log_entries.each do |entry| %>
+    <thead>
+      <tr class="log_entry <%= entry.success_parsed_details? ? 'success' : 'fail' %>">
+        <td colspan='2'>
+          <i class='icon icon-<%= entry.success_parsed_details? ? 'ok-circle' : 'remove-sign' %>'></i> <%= pretty_time(entry.created_at) %>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render "spree/admin/log_entries/#{@payment.payment_method.method_type.gsub(' ', '').underscore}", entry: entry %>
+    </tbody>
+  <% end %>
+</table>

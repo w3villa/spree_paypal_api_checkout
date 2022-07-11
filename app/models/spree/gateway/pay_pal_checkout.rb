@@ -21,38 +21,24 @@ module Spree
     end
 
     def generate_access_token
-      uri = URI.parse("https://#{preferred_server}/v1/oauth2/token")
-      request = Net::HTTP::Post.new(uri)
-      request.basic_auth("#{preferred_api_key}", "#{preferred_secret_key}")
-      request.content_type = 'application/json'
-      request.body = 'grant_type=client_credentials'
-
-      req_options = { use_ssl: uri.scheme == 'https' }
-
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        response = http.request(request)
-      end
-      return JSON.parse(response.read_body)['access_token']
+      response = post_response_without_token(api_url('v1/oauth2/token'))
+      return response['access_token']
     end
 
     def generate_client_token
-      uri = URI.parse("https://#{preferred_server}/v1/identity/generate-token")
-      return post_response(uri)
+      post_response(api_url('v1/identity/generate-token'))
     end
 
     def create_order order, body
-      uri = URI.parse("https://#{preferred_server}/v2/checkout/orders")
-      return post_response(uri, body)
+      post_response(api_url('v2/checkout/orders'), body)
     end
 
     def capture_payment order_id
-      uri = URI.parse("https://#{preferred_server}/v2/checkout/orders/#{order_id}/capture")
-      return post_response(uri)
+      post_response(api_url("v2/checkout/orders/#{order_id}/capture"))
     end
 
     def refund_payment id, body
-      uri = URI.parse("https://#{preferred_server}/v2/payments/captures/#{id}/refund")
-      return post_response(uri, body)
+      post_response(api_url("v2/payments/captures/#{id}/refund"), body)
     end
 
     def purchase(amount, express_checkout, gateway_options={})
@@ -78,8 +64,10 @@ module Spree
         refund_type: refund_type,
         refund_source: 'any'
       }
-      refund_transaction_response = refund_payment(payment.source.transaction_id, refund_transaction)
-      if refund_transaction_response['status']=='COMPLETED'
+      refund_entry = refund_payment(payment.source.transaction_id, refund_transaction)
+      refund_transaction_response = parse_response(refund_entry)
+
+      if success_response?(refund_transaction_response)
         payment.source.update({
           :refunded_at => Time.now,
           :refund_transaction_id => refund_transaction_response['id'],
@@ -87,7 +75,7 @@ module Spree
           :refund_type => refund_type
         })
 
-        payment.class.create!(
+        refund_payment = payment.class.create!(
           :order => payment.order,
           :source => payment,
           :payment_method => payment.payment_method,
@@ -95,6 +83,7 @@ module Spree
           :response_code => refund_transaction_response['id'],
           :state => 'completed'
         )
+        refund_payment.log_entries.create!(details: refund_entry.to_yaml)
       end
       refund_transaction_response
     end
@@ -102,14 +91,84 @@ module Spree
     def post_response uri, body={}
       request = Net::HTTP::Post.new(uri)
       request['Authorization'] = "Bearer #{generate_access_token}"
+      request.body = body.to_json if body.present?
+
+      return hit_api(request: request, body: body, uri: uri)
+    end
+
+    def post_response_without_token uri, body={}
+      request = Net::HTTP::Post.new(uri)
+      request.basic_auth("#{preferred_api_key}", "#{preferred_secret_key}")
+      request.body = 'grant_type=client_credentials'
+
+      return parse_response(hit_api(request: request, body: body, uri: uri))
+    end
+
+    def hit_api request:, body:, uri:
       request.content_type = 'application/json'
       req_options = { use_ssl: uri.scheme == 'https' }
 
-      request.body = body.to_json if body.present?
       response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         response = http.request(request)
       end
-      return JSON.parse(response.read_body)
+      response
+    end
+
+    def parse_response response
+      JSON.parse(response.read_body) rescue response
+    end
+
+    def api_url url
+      URI.parse("https://#{preferred_server}/#{url}")
+    end
+
+    def set_payment_records order, number, payment_method
+      raw_response = response = nil
+      success = false
+      begin
+        payment_entry = capture_payment(number)
+        response = parse_response(payment_entry)
+        success = success_response?(response)
+
+        payment = order.payments.create!({
+          source: Spree::PaypalApiCheckout.create({
+            token: response['id'],
+            payer_id: response['payer']['payer_id']
+          }),
+          amount: order.total,
+          payment_method: payment_method
+        })
+      rescue Exception => e
+        raw_response = e.response.body
+        response = response_error(raw_response)
+      rescue JSON::ParserError
+        response = json_error(raw_response)
+      end
+
+      payment.log_entries.create!(details: payment_entry.to_yaml)
+      response
+    end
+
+    def response_error(raw_response)
+      begin
+        parse(raw_response)
+      rescue JSON::ParserError
+        json_error(raw_response)
+      end
+    end
+
+    def json_error(raw_response)
+      msg = 'Invalid response. Please contact team if you continue to receive this message.'
+      msg += "  (The raw response returned by the API was #{raw_response.inspect})"
+      {
+        "error" => {
+          "message" => msg
+        }
+      }
+    end
+
+    def success_response? response
+      response.key?('status') && response.key?('id') && (response['status'] == 'COMPLETED')
     end
   end
 end
