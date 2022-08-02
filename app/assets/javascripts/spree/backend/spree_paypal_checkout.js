@@ -3,7 +3,7 @@
 SpreePaypalCheckout = {
   hideSettings: function(paymentMethod) {
     if (SpreePaypalCheckout.paymentMethodID && paymentMethod.val() == SpreePaypalCheckout.paymentMethodID) {
-      $('.payment-method-settings').children().hide();
+      // $('.payment-method-settings').children().hide();
       $('#payment_amount').prop('disabled', 'disabled');
       $('button[type="submit"]').prop('disabled', 'disabled');
       $('#paypal-warning').show();

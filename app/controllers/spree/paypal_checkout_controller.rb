@@ -84,6 +84,7 @@ module Spree
         intent: 'CAPTURE',
         purchase_units: [
           {
+            invoice_id: current_order.number,
             amount: {
               currency_code: current_order.currency,
               value: order.total,

@@ -1,5 +1,5 @@
 module Spree
-  LogEntry.class_eval do
+  module LogEntryDecorator
     def parsed_details
       @details ||= YAML.safe_load(details, [ActiveMerchant::Billing::Response, Net::HTTPCreated, URI::HTTPS, URI::RFC3986_Parser, Symbol, Regexp, Object])
     end
@@ -19,3 +19,4 @@ module Spree
     end
   end
 end
+::Spree::LogEntry.prepend(Spree::LogEntryDecorator)
