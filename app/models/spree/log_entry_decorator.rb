@@ -1,7 +1,7 @@
 module Spree
   module LogEntryDecorator
     def parsed_details
-      @details ||= YAML.safe_load(details, [ActiveMerchant::Billing::Response, Net::HTTPCreated, URI::HTTPS, URI::RFC3986_Parser, Symbol, Regexp, Object])
+      @details ||= YAML.safe_load(details, [ActiveMerchant::Billing::Response, Net::HTTPCreated, URI::HTTPS, URI::RFC3986_Parser, Symbol, Regexp, Object, ActiveMerchant::Billing::MultiResponse]) rescue nil
     end
 
     def success_parsed_details?
