@@ -21,7 +21,7 @@
       </tr>
     </thead>
     <tbody>
-      <%= render "spree/admin/log_entries/#{@payment.payment_method.method_type.gsub(' ', '').underscore}", entry: entry %>
+      <%= render "spree/admin/log_entries/#{@payment.payment_method.method_type.gsub(' ', '').underscore}", entry: entry rescue '' %>
     </tbody>
   <% end %>
 </table>
